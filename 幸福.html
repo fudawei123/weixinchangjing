@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>Title</title>
+    <link rel="stylesheet" href="lib/swiper.min.css">
+    <link rel="stylesheet" href="iconfont/ux_1472439021_0279546/iconfont.css">
+    <link rel="stylesheet" href="lib/animate.min.css">
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        html,body{
+            height: 100%;
+        }
+        .swiper-container{
+            height: 100%;
+        }
+        .swiper-slide{
+            background-position: center top;
+            background-size: cover;
+            position: relative;
+        }
+        .loading{
+            width: 100%;
+            height: 100%;
+            background: white;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 99;
+        }
+        .loading ul{
+            position: absolute;
+            left: 50%;
+            margin-left: -5px;
+            top: 50%;
+            margin-top: -5px;
+        }
+        .loading li{
+            width: 30px;
+            height: 30px;
+            background: green;
+            border-radius: 50%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: 1.6s;
+        }
+        @keyframes play{
+            0%{
+                width: 30px;
+                height: 30px;
+            }
+            50%{
+                width: 0;
+                height: 0;
+            }
+            100%{
+                width: 30px;
+                height: 30px;
+            }
+        }
+        .music{
+            width: 30px;
+            height: 30px;
+            background: url("images/music.png") no-repeat 0 0;
+            background-size: cover;
+            border-radius: 50%;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            z-index: 88;
+            transition: 1s;
+        }
+        .iconfont{
+            color: rgba(255,255,255,0.5);
+            animation: 1s music linear;
+        }
+        @keyframes music{
+            0%{
+                transform: translateY(0px) scale(1);
+            }
+            100%{
+                transform: translateY(-30px) scale(0.5);
+            }
+        }
+        .arrow{
+            width: 92px;
+            height: 52px;
+            background: url("images/arr.png") no-repeat 0 0;
+            position: absolute;
+            left: 50%;
+            margin-left: -46px;
+            bottom: 30px;
+            z-index: 88;
+            animation: 2s arrow infinite linear;
+        }
+        @keyframes arrow{
+            0%{
+                transform: translateY(0);
+                opacity: 0;
+            }
+            50%{
+                transform: translateY(-25px);
+                opacity: 1;
+            }
+            100%{
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+        .h11{
+            color: white;
+            font-size: 50px;
+            position: absolute;
+            left: 100px;
+            bottom: 200px;
+        }
+        .p1{
+            color: white;
+            font-size: 30px;
+            position: absolute;
+            left: 100px;
+            bottom: 100px;
+        }
+        .h12{
+            color: white;
+            font-size: 50px;
+            position: absolute;
+            left: 100px;
+            top: 100px;
+        }
+        .p2{
+            color: white;
+            font-size: 30px;
+            position: absolute;
+            left: 100px;
+            top: 200px;
+        }
+    </style>
+    <script src="lib/jquery-1.11.1.min.js"></script>
+    <script src="lib/swiper.min.js"></script>
+    <script src="lib/swiper.animate.min.js"></script>
+    <script>
+        window.onload=function(){
+            var $lis=$(".loading>ul").children("li");
+            var $music=$(".music");
+            var $a1=$(".a1");
+            var timerMusic=null;
+
+            var height=$(window).height();
+            var scale=height/950;
+            $("[name='viewport']").attr("content","width=device-width,initial-scale="+scale+",user-scalable=no");
+
+            //轮播
+            var swiper=new Swiper(".swiper-container",{
+                direction:"vertical",
+                loop:true,
+                pagination:".swiper-pagination",
+                paginationType:"fraction",
+                onInit: function(swiper){
+                    swiperAnimateCache(swiper);
+                    swiperAnimate(swiper);
+                },
+                onSlideChangeEnd: function(swiper){
+                    swiperAnimate(swiper);
+                }
+            });
+
+            //进度
+            var deg=360/$lis.size();
+            $lis.each(function(index,item){
+                item.style.transform="rotateZ("+deg*index+"deg) translateX(50px)";
+                item.style.animation="1.6s play "+index*0.2+"s infinite linear";
+            });
+            var timer=setTimeout(function(){
+                $(".loading").remove();
+                timer=null;
+                $a1.get(0).play();
+            },3000);
+
+            //音乐盒
+            var allTime=$a1.get(0).duration;
+            $music.on("click",function(){
+                if($a1.get(0).paused){
+                    $a1.get(0).play();
+                    timerMusic=setInterval(playMusic,1000);
+                }else{
+                    $a1.get(0).pause();
+                    clearInterval(timerMusic);
+                    timer=null;
+                }
+            });
+            playMusic();
+            timerMusic=setInterval(playMusic,1000);
+            function playMusic(){
+                var playTime=$a1.get(0).currentTime;
+                $music.css({
+                    transform:"rotateZ("+360/allTime*playTime+"deg)"
+                });
+                var $oDiv=$("<div class='iconfont'>&#xe62f;</div>");
+                $oDiv.on("animationend",function(){
+                    $oDiv.remove();
+                });
+                $music.append($oDiv);
+            }
+        };
+    </script>
+</head>
+<body>
+<div class="swiper-container">
+    <div class="loading">
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+    <div class="music"></div>
+    <audio src="music/1.mp3" class="a1" loop></audio>
+    <div class="arrow"></div>
+    <div class="swiper-wrapper">
+        <div class="swiper-slide" style="background-image: url(images/1.jpg)">
+            <h1 class="ani h11" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p1" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">并不是你的房子有多大，<br>而是房子传出来的笑声有多甜。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/2.jpg)">
+            <h1 class="ani h11" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p1" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是你开多豪华的车，<br>而是你可以开着车平安回家。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/3.jpg)">
+            <h1 class="ani h12" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p2" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是你存了多少钱，而是天天<br>身心自由，不停地干自己喜欢的事。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/4.jpg)">
+            <h1 class="ani h12" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p2" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是你的爱人有多漂亮，<br>而是你的爱人笑的有多灿烂。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/5.jpg)">
+            <h1 class="ani h11" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p1" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是吃得好穿的好，<br>而是没病没灾。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/6.jpg)">
+            <h1 class="ani h11" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p1" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是在你成功时喝彩多热烈，而<br>是失意时有个声音对你说：亲爱<br>的,加油。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/7.jpg)">
+            <h1 class="ani h12" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p2" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是你听过多少甜言蜜语，而<br>是你伤心落泪时有人对你说：<br>没事，有我在。</p>
+        </div>
+        <div class="swiper-slide" style="background-image: url(images/8.jpg)">
+            <h1 class="ani h12" swiper-animate-effect="fadeInLeft" swiper-animate-duration="2s">幸福</h1>
+            <p class="ani p2" swiper-animate-effect="fadeInRight" swiper-animate-duration="2s">不是你能走得多远，而是无论<br>走到哪里，有个人会一直陪着<br>你走。</p>
+        </div>
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+</body>
+</html>
